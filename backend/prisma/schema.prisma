@@ -1,0 +1,125 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────
+// ENUMS
+// ─────────────────────────────────────────────
+
+enum Plan {
+  FREE
+  PREMIUM
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+// ─────────────────────────────────────────────
+// USER
+// ─────────────────────────────────────────────
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String
+  plan      Plan     @default(FREE)
+
+  // Stripe
+  stripeCustomerId     String? @unique
+  stripeSubscriptionId String? @unique
+
+  // Refresh token (hashed)
+  refreshToken String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  categories   Category[]
+  transactions Transaction[]
+  goals        Goal[]
+
+  @@map("users")
+}
+
+// ─────────────────────────────────────────────
+// CATEGORY
+// ─────────────────────────────────────────────
+
+model Category {
+  id       String  @id @default(cuid())
+  name     String
+  icon     String? // emoji ou nome do ícone
+  color    String? // hex color
+  isSystem Boolean @default(false) // categorias padrão do sistema
+
+  // null = categoria do sistema (global)
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  transactions Transaction[]
+  goals        Goal[]
+
+  @@unique([name, userId]) // nome único por usuário (ou global se userId null)
+  @@map("categories")
+}
+
+// ─────────────────────────────────────────────
+// TRANSACTION
+// ─────────────────────────────────────────────
+
+model Transaction {
+  id          String          @id @default(cuid())
+  amount      Decimal         @db.Decimal(12, 2)
+  type        TransactionType
+  description String?
+  date        DateTime
+
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, date])
+  @@index([userId, categoryId])
+  @@map("transactions")
+}
+
+// ─────────────────────────────────────────────
+// GOAL (Meta de gasto por categoria)
+// ─────────────────────────────────────────────
+
+model Goal {
+  id         String  @id @default(cuid())
+  amount     Decimal @db.Decimal(12, 2)
+  month      Int     // 1–12
+  year       Int
+  notified   Boolean @default(false) // alerta já enviado?
+
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, categoryId, month, year])
+  @@map("goals")
+}
