@@ -2,13 +2,17 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 
 async function bootstrap(): Promise<void> {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { rawBody: true });
 
   // ── Global prefix & versioning ──────────────────────────────
   app.setGlobalPrefix('api');
   app.enableVersioning({ type: VersioningType.URI, defaultVersion: '1' });
+
+  // ── Global exception filter ──────────────────────────────────
+  app.useGlobalFilters(new GlobalExceptionFilter());
 
   // ── CORS ────────────────────────────────────────────────────
   app.enableCors({
