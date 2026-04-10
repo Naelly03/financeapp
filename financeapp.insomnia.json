@@ -1,0 +1,376 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_source": "insomnia.desktop.app",
+  "resources": [
+    {
+      "_id": "wrk_financeapp",
+      "_type": "workspace",
+      "name": "FinanceApp API",
+      "description": "",
+      "scope": "collection"
+    },
+    {
+      "_id": "env_base",
+      "_type": "environment",
+      "parentId": "wrk_financeapp",
+      "name": "Base Environment",
+      "data": {
+        "baseUrl": "http://localhost:3001/api/v1",
+        "accessToken": "",
+        "refreshToken": "",
+        "categoryId": "",
+        "transactionId": "",
+        "goalId": ""
+      }
+    },
+
+    {
+      "_id": "fld_auth",
+      "_type": "request_group",
+      "parentId": "wrk_financeapp",
+      "name": "Auth",
+      "description": ""
+    },
+    {
+      "_id": "req_register",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "Register",
+      "method": "POST",
+      "url": "{{ _.baseUrl }}/auth/register",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Test User\",\n  \"email\": \"test@example.com\",\n  \"password\": \"Password123!\"\n}"
+      },
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "description": "Retorna accessToken e refreshToken — salve-os nas variáveis de ambiente"
+    },
+    {
+      "_id": "req_login",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "Login",
+      "method": "POST",
+      "url": "{{ _.baseUrl }}/auth/login",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"Password123!\"\n}"
+      },
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "description": "Retorna accessToken e refreshToken — salve-os nas variáveis de ambiente"
+    },
+    {
+      "_id": "req_refresh",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "Refresh Token",
+      "method": "POST",
+      "url": "{{ _.baseUrl }}/auth/refresh",
+      "body": { "mimeType": "application/json", "text": "" },
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.refreshToken }}" }
+      ],
+      "description": "Usa o refreshToken para obter novos tokens"
+    },
+    {
+      "_id": "req_logout",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "Logout",
+      "method": "POST",
+      "url": "{{ _.baseUrl }}/auth/logout",
+      "body": { "mimeType": "application/json", "text": "" },
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.accessToken }}" }
+      ]
+    },
+
+    {
+      "_id": "fld_users",
+      "_type": "request_group",
+      "parentId": "wrk_financeapp",
+      "name": "Users",
+      "description": ""
+    },
+    {
+      "_id": "req_me",
+      "_type": "request",
+      "parentId": "fld_users",
+      "name": "Get Me",
+      "method": "GET",
+      "url": "{{ _.baseUrl }}/users/me",
+      "body": {},
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.accessToken }}" }
+      ]
+    },
+
+    {
+      "_id": "fld_categories",
+      "_type": "request_group",
+      "parentId": "wrk_financeapp",
+      "name": "Categories",
+      "description": ""
+    },
+    {
+      "_id": "req_categories_list",
+      "_type": "request",
+      "parentId": "fld_categories",
+      "name": "List Categories",
+      "method": "GET",
+      "url": "{{ _.baseUrl }}/categories",
+      "body": {},
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.accessToken }}" }
+      ]
+    },
+    {
+      "_id": "req_categories_create",
+      "_type": "request",
+      "parentId": "fld_categories",
+      "name": "Create Category",
+      "method": "POST",
+      "url": "{{ _.baseUrl }}/categories",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Alimentação\",\n  \"icon\": \"🍔\",\n  \"color\": \"#FF6B6B\"\n}"
+      },
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.accessToken }}" },
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "description": "Salve o id retornado na variável categoryId"
+    },
+    {
+      "_id": "req_categories_update",
+      "_type": "request",
+      "parentId": "fld_categories",
+      "name": "Update Category",
+      "method": "PATCH",
+      "url": "{{ _.baseUrl }}/categories/{{ _.categoryId }}",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Alimentação e Bebidas\",\n  \"color\": \"#FF4444\"\n}"
+      },
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.accessToken }}" },
+        { "name": "Content-Type", "value": "application/json" }
+      ]
+    },
+    {
+      "_id": "req_categories_delete",
+      "_type": "request",
+      "parentId": "fld_categories",
+      "name": "Delete Category",
+      "method": "DELETE",
+      "url": "{{ _.baseUrl }}/categories/{{ _.categoryId }}",
+      "body": {},
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.accessToken }}" }
+      ]
+    },
+
+    {
+      "_id": "fld_transactions",
+      "_type": "request_group",
+      "parentId": "wrk_financeapp",
+      "name": "Transactions",
+      "description": ""
+    },
+    {
+      "_id": "req_transactions_list",
+      "_type": "request",
+      "parentId": "fld_transactions",
+      "name": "List Transactions",
+      "method": "GET",
+      "url": "{{ _.baseUrl }}/transactions",
+      "parameters": [
+        { "name": "month", "value": "4" },
+        { "name": "year", "value": "2026" },
+        { "name": "page", "value": "1" },
+        { "name": "limit", "value": "20" },
+        { "name": "type", "value": "EXPENSE", "disabled": true },
+        { "name": "categoryId", "value": "{{ _.categoryId }}", "disabled": true }
+      ],
+      "body": {},
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.accessToken }}" }
+      ]
+    },
+    {
+      "_id": "req_transactions_create",
+      "_type": "request",
+      "parentId": "fld_transactions",
+      "name": "Create Transaction",
+      "method": "POST",
+      "url": "{{ _.baseUrl }}/transactions",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"amount\": 50.00,\n  \"type\": \"EXPENSE\",\n  \"description\": \"Almoço\",\n  \"date\": \"2026-04-09\",\n  \"categoryId\": \"{{ _.categoryId }}\"\n}"
+      },
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.accessToken }}" },
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "description": "type: INCOME ou EXPENSE. Salve o id retornado na variável transactionId"
+    },
+    {
+      "_id": "req_transactions_update",
+      "_type": "request",
+      "parentId": "fld_transactions",
+      "name": "Update Transaction",
+      "method": "PATCH",
+      "url": "{{ _.baseUrl }}/transactions/{{ _.transactionId }}",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"amount\": 45.00,\n  \"description\": \"Almoço atualizado\"\n}"
+      },
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.accessToken }}" },
+        { "name": "Content-Type", "value": "application/json" }
+      ]
+    },
+    {
+      "_id": "req_transactions_delete",
+      "_type": "request",
+      "parentId": "fld_transactions",
+      "name": "Delete Transaction",
+      "method": "DELETE",
+      "url": "{{ _.baseUrl }}/transactions/{{ _.transactionId }}",
+      "body": {},
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.accessToken }}" }
+      ]
+    },
+
+    {
+      "_id": "fld_goals",
+      "_type": "request_group",
+      "parentId": "wrk_financeapp",
+      "name": "Goals",
+      "description": ""
+    },
+    {
+      "_id": "req_goals_list",
+      "_type": "request",
+      "parentId": "fld_goals",
+      "name": "List Goals",
+      "method": "GET",
+      "url": "{{ _.baseUrl }}/goals",
+      "parameters": [
+        { "name": "month", "value": "4" },
+        { "name": "year", "value": "2026" }
+      ],
+      "body": {},
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.accessToken }}" }
+      ]
+    },
+    {
+      "_id": "req_goals_create",
+      "_type": "request",
+      "parentId": "fld_goals",
+      "name": "Create Goal",
+      "method": "POST",
+      "url": "{{ _.baseUrl }}/goals",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"amount\": 500.00,\n  \"month\": 4,\n  \"year\": 2026,\n  \"categoryId\": \"{{ _.categoryId }}\"\n}"
+      },
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.accessToken }}" },
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "description": "Salve o id retornado na variável goalId"
+    },
+    {
+      "_id": "req_goals_update",
+      "_type": "request",
+      "parentId": "fld_goals",
+      "name": "Update Goal",
+      "method": "PATCH",
+      "url": "{{ _.baseUrl }}/goals/{{ _.goalId }}",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"amount\": 400.00\n}"
+      },
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.accessToken }}" },
+        { "name": "Content-Type", "value": "application/json" }
+      ]
+    },
+    {
+      "_id": "req_goals_delete",
+      "_type": "request",
+      "parentId": "fld_goals",
+      "name": "Delete Goal",
+      "method": "DELETE",
+      "url": "{{ _.baseUrl }}/goals/{{ _.goalId }}",
+      "body": {},
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.accessToken }}" }
+      ]
+    },
+
+    {
+      "_id": "fld_summary",
+      "_type": "request_group",
+      "parentId": "wrk_financeapp",
+      "name": "Summary",
+      "description": ""
+    },
+    {
+      "_id": "req_summary",
+      "_type": "request",
+      "parentId": "fld_summary",
+      "name": "Get Summary",
+      "method": "GET",
+      "url": "{{ _.baseUrl }}/summary",
+      "parameters": [
+        { "name": "month", "value": "4" },
+        { "name": "year", "value": "2026" }
+      ],
+      "body": {},
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.accessToken }}" }
+      ]
+    },
+
+    {
+      "_id": "fld_billing",
+      "_type": "request_group",
+      "parentId": "wrk_financeapp",
+      "name": "Billing",
+      "description": ""
+    },
+    {
+      "_id": "req_billing_checkout",
+      "_type": "request",
+      "parentId": "fld_billing",
+      "name": "Create Checkout Session",
+      "method": "POST",
+      "url": "{{ _.baseUrl }}/billing/checkout",
+      "body": { "mimeType": "application/json", "text": "" },
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.accessToken }}" }
+      ]
+    },
+    {
+      "_id": "req_billing_portal",
+      "_type": "request",
+      "parentId": "fld_billing",
+      "name": "Create Portal Session",
+      "method": "POST",
+      "url": "{{ _.baseUrl }}/billing/portal",
+      "body": { "mimeType": "application/json", "text": "" },
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.accessToken }}" }
+      ]
+    }
+  ]
+}
